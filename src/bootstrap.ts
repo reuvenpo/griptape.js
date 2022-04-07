@@ -28,6 +28,8 @@ const systemDefaultFees: FeeTable = {
   send: getFeeForExecute(90_000) || defaultFee,
 };
 
+const defaultGasPrice = 0.25;
+
 export { BroadcastMode };
 
 export interface DefaultFees {
@@ -42,6 +44,7 @@ export interface Config {
   chainId?: string;
   broadcastMode?: BroadcastMode;
   defaultFees?: DefaultFees;
+  gasPrice?: number;
 }
 
 export interface AccountProvider {
@@ -89,10 +92,16 @@ export async function gripApp(
   if (!config) {
     // Set the configuration.
     if (typeof _config === 'string') {
-      config = { restUrl: _config, broadcastMode: BroadcastMode.Sync };
+      config = {
+        restUrl: _config,
+        broadcastMode: BroadcastMode.Sync,
+      };
     } else {
       _config.broadcastMode = _config.broadcastMode ?? BroadcastMode.Sync;
       config = _config;
+      if (typeof config.gasPrice === 'undefined') {
+        config.gasPrice = defaultGasPrice;
+      }
     }
 
     // `CosmWasmClient` should be created first.

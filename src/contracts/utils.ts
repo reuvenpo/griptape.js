@@ -1,4 +1,6 @@
 import { StdFee } from 'secretjs/types/types';
+import { getConfig } from "../bootstrap";
+import { ErrorHandler } from './types';
 
 export function getValue(object: any, key: string): any {
   let value;
@@ -52,9 +54,12 @@ export function calculateCommonKeys(
   return result;
 }
 
-const gasPriceUscrt = 0.25;
 export function getFeeForExecute(gas: number | undefined): StdFee | undefined {
   if (!gas) return undefined;
+  const config = getConfig();
+  if (!config) throw new Error('No config available');
+  const { gasPrice: gasPriceUscrt } = config;
+  if (!gasPriceUscrt) throw new Error("No gas price available")
   return {
     amount: [
       {
